@@ -1,0 +1,85 @@
+:root {
+    --topic-body-width: 690px;
+    --topic-body-width-padding: 11px;
+    --topic-avatar-width: 45px;
+    --tw-shadow: 0 0 0 var(--border-width) #d0d0d0 inset;
+    --d-border-radius: initial;
+    --d-nav-pill-border-radius: var(--d-border-radius);
+    --d-button-border-radius: var(--d-border-radius);
+    --d-input-border-radius: var(--d-border-radius)
+}
+
+:root {
+    --base-font-size-smallest: 0.815em;
+    --base-font-size-smaller: 0.875em;
+    --base-font-size: 0.938em;
+    --base-font-size-larger: 1.063em;
+    --base-font-size-largest: 1.118em;
+    --font-up-6: 2.296em;
+    --font-up-5: 2em;
+    --font-up-4: 1.7511em;
+    --font-up-3: 1.5157em;
+    --font-up-2: 1.3195em;
+    --font-up-1: 1.1487em;
+    --font-0: 1em;
+    --font-down-1: 0.8706em;
+    --font-down-2: 0.7579em;
+    --font-down-3: 0.6599em;
+    --font-down-4: 0.5745em;
+    --font-down-5: 0.5em;
+    --font-down-6: 0.4355em;
+    --font-up-3-rem: 1.5157rem;
+    --font-up-2-rem: 1.3195rem;
+    --font-up-1-rem: 1.1487rem;
+    --font-0-rem: 1rem;
+    --font-down-1-rem: 0.8706rem;
+    --font-down-2-rem: 0.7579rem;
+    --font-size-ios-input: 1.07em;
+    --line-height-small: 1;
+    --line-height-medium: 1.2;
+    --line-height-large: 1.4
+}
+
+
+nav.post-controls {
+    --control-margin: 0.33em;
+    --control-icon-space: 0.33em;
+}
+
+
+nav.post-controls {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #bbb;
+}
+
+nav.post-controls .actions {
+    display: inline-flex;
+    text-align: right;
+    margin-left: auto;
+}
+
+nav.post-controls .actions button {
+    flex: 0 1 auto;
+    font-size: var(--font-up-1);
+    padding: 8px 10px;
+    vertical-align: top;
+    background: transparent;
+    border: none;
+}
+
+nav.post-controls .actions button.create {
+    margin-right: 0;
+    color: var(--primary-high-or-secondary-low);
+}
+
+nav.post-controls .actions button.create {
+    margin-left: calc(var(--control-margin) * 1.52);
+}
+.discourse-no-touch .topic-body .actions .fade-out {
+    opacity: 0.7;
+    transition: background 0.25s, opacity 0.7s ease-in-out;
+}
+
