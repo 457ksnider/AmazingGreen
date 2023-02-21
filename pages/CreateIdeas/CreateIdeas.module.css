@@ -1,6 +1,5 @@
 .container {
-  padding-top: 96px;
-  min-height: 100vh;
+  min-height: 85vh;
 }
 
 .title {
@@ -10,14 +9,16 @@
 
 .divider {
   height: 1px;
-  width: 960px;
-  max-width: 95%;
+  max-width: 100%;
   background: #ebebeb;
 }
 
 .form {
   width: 640px;
   max-width: 95%;
+  border: 1px solid;
+  padding: 1rem;
+  color: white;
 }
 
 .form h6 {

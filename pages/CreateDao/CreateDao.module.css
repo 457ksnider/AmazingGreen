@@ -1,6 +1,5 @@
 .container {
-  padding-top: 96px;
-  min-height: 100vh;
+  min-height: 85vh;
 }
 
 .title {
@@ -23,6 +22,7 @@
   max-width: 95%;
   border: 1px solid;
   padding: 1rem;
+  color: white;
 }
 
 .form h6 {

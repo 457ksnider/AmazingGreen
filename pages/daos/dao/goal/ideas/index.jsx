@@ -19,6 +19,7 @@ let IdeasWaiting = false;
 let running = true;
 export default function GrantIdeas() {
 	//variables
+	const [goalId, setGoalId] = useState(-1);
 	const [ideaId, setIdeasId] = useState(-1);
 	const [imageList, setimageList] = useState([]);
 	const [IdeasURI, setIdeasURI] = useState({ideasId: "", Title: "", Description: "", wallet: "", logo: "", End_Date: "", voted: 0, isVoted: true, allfiles: []});
@@ -126,13 +127,16 @@ export default function GrantIdeas() {
 				const ideaURI = await contract.ideas_uri(Number(id)).call(); //Getting ideas uri
 				const object = JSON.parse(ideaURI); //Getting ideas uri
 				Goalid = await contract.get_goal_id_from_ideas_uri(ideaURI).call();
-
+				setGoalId(Goalid);
 				const goalURI = JSON.parse(await contract.goal_uri(Number(Goalid)).call()); //Getting goal URI
 				let isvoted = false;
+				let voted = 0;
+
 				const Allvotes = await contract.get_ideas_votes_from_goal(Number(Goalid), Number(id)).call(); //Getting all votes
 				for (let i = 0; i < Allvotes.length; i++) {
 					const element = Allvotes[i];
-					if (element === signerAddress) isvoted = true;
+					if (element !== "") voted++;
+					if (element ===  window.ethereum.selectedAddress) isvoted = true;
 				}
 				setAccountAddress(object.properties.wallet.description);
 
@@ -143,7 +147,7 @@ export default function GrantIdeas() {
 					wallet: object.properties.wallet.description,
 					logo: object.properties.logo.description.url,
 					End_Date: goalURI.properties.End_Date?.description,
-					voted: Object.keys(Allvotes).length,
+					voted: voted,
 					donation: Number( (await contract._ideas_uris(Number(id)).call()).donation)  / 10**9,
 					isVoted: isvoted,
 					allfiles: object.properties.allFiles
@@ -195,7 +199,7 @@ export default function GrantIdeas() {
 
 	async function VoteIdees() {
 		try {
-			await sendTransaction(contract.create_goal_ideas_vote(Number(Goalid), Number(id), signerAddress));
+			await sendTransaction(contract.create_goal_ideas_vote(Number(goalId), Number(id), window.ethereum.selectedAddress));
 		} catch (error) {
 			console.error(error);
 			return;
@@ -258,7 +262,7 @@ export default function GrantIdeas() {
 					<div style={{position: "relative"}}>
 						<Loader
 							element={
-								<h1 className="text-moon-32 font-bold pb-2" style={{width: "78%"}}>
+								<h1 className="text-moon-32 font-bold pb-2" style={{width: "78%", color: "white"}}>
 									{IdeasURI.Title}
 								</h1>
 							}
@@ -279,7 +283,7 @@ export default function GrantIdeas() {
 					<div>
 						<Loader
 							element={
-								<a className="font-medium text-[#0000ff]" href={`https://moonbase.moonscan.io/address/${IdeasURI.wallet}`} rel="noreferrer" target="_blank">
+								<a className="font-medium "  href={`https://moonbase.moonscan.io/address/${IdeasURI.wallet}`} rel="noreferrer" target="_blank">
 									{IdeasURI.wallet}
 								</a>
 							}
@@ -288,19 +292,19 @@ export default function GrantIdeas() {
 					</div>
 					<Loader
 						element={
-							<a className="text-piccolo" name="dateleft" date={IdeasURI.End_Date}>
+							<a className="text-piccolo" name="dateleft"  style={{color: "white"}}  date={IdeasURI.End_Date}>
 								{LeftDate(IdeasURI.End_Date)}
 							</a>
 						}
 						width={"80%"}
 					/>
 
-					<Loader element={<div className="flex">Voted: {IdeasURI.voted} </div>} width={"100%"} />
-					<Loader element={<div className="flex">Donated: {IdeasURI.donation} </div>} width={"100%"} />
-					<Loader element={<p>{IdeasURI.Description} </p>} width={"100%"} />
+					<Loader element={<div className="flex"  style={{color: "white"}} >Voted: {IdeasURI.voted} </div>} width={"100%"} />
+					<Loader element={<div className="flex"  style={{color: "white"}} >Donated: {IdeasURI.donation} </div>} width={"100%"} />
+					<Loader element={<p  style={{color: "white"}} >{IdeasURI.Description} </p>} width={"100%"} />
 				</div>
 				<div className={`${styles.tabtitle} flex gap-4 justify-start`}>
-					<a className={`tab block cursor-pointer py-2 text-3xl text-[#0000ff]`}>Ideas</a>
+					<a className={`tab block cursor-pointer py-2 text-3xl text-[#e2107b]`}>Ideas</a>
 					<div className="flex justify-end w-full gap-4">
 						{!IdeasURI.isVoted ? (
 							<>

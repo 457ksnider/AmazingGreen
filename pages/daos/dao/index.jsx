@@ -77,6 +77,7 @@ export default function DAO() {
 				const totalGoals = await contract.get_all_goals_by_dao_id(Number(id)).call() //Getting all goals by dao id
 				const arr = []
 				for (let i = 0; i < Object.keys(totalGoals).length; i++) {
+					if (totalGoals[i]=== "") continue;
 					//total dao number Iteration
 					const goalid = await contract.get_goal_id_by_goal_uri(totalGoals[i]).call()
 					const object = JSON.parse(totalGoals[i])

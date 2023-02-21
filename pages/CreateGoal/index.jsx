@@ -210,12 +210,12 @@ export default function CreateGoal() {
       <div
         className={`${styles.container} flex items-center justify-center flex-col gap-8`}
       >
+      <div className={`${styles.form} flex flex-col gap-8`}>
         <div className={`${styles.title} gap-8 flex flex-col`}>
           <h1 className="text-moon-32 font-bold">Create goal</h1>
 
         </div>
         <div className={styles.divider}></div>
-        <div className={`${styles.form} flex flex-col gap-8`}>
           <div>
             <h6>Goal name</h6>
             {GoalTitleInput}
@@ -295,7 +295,7 @@ export default function CreateGoal() {
           </div>
           <div>
             <h6>Structure</h6>
-            <div className="flex gap-8">
+            <div className="flex gap-8" style={{color: 'black'}}>
               <div style={{ boxShadow: '#907979 0 0 10px 0px' }} className="bg-white rounded-lg flex flex-col p-2  pb-2 w-48 pb-0">
                 <h6 onInput={e => { StructureLeft[0] = e.currentTarget.innerText }} contentEditable="true" suppressContentEditableWarning={true} className="border-2 hover:bg-[#d1d5db] hover:cursor-pointer bg-white flex hover:bg-gray-200 items-center p-2 rounded-lg w-full">
                  Representatives Lake Nona

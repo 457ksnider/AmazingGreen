@@ -90,6 +90,7 @@ export default function Goal() {
 				const totalIdeas = await contract.get_all_ideas_by_goal_id(Number(id)).call() //Getting total goal (Number)
 				const arr = []
 				for (let i = 0; i < Object.keys(totalIdeas).length; i++) {
+					if (totalIdeas[i]=== "") continue;
 					//total goal number Iteration
 					const ideasId = await contract.get_ideas_id_by_ideas_uri(totalIdeas[i]).call()
 					const object = JSON.parse(totalIdeas[i])

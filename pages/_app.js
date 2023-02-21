@@ -9,7 +9,7 @@ function MyApp({ Component, pageProps }) {
 		<SnackbarProvider anchorOrigin={{
 			vertical: 'top',
 			horizontal: 'right',
-		  }} maxSnack={3}>
+		  }} autoHideDuration={30000} maxSnack={3}>
 			<ThemeProvider theme={moonDesignLight}>
 				<Component {...pageProps} />
 			</ThemeProvider>

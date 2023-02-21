@@ -74,9 +74,10 @@ export async function sendTransfer(chainid, amount, Recipient, ShowAlert) {
 		await (await targetTokenBridge.createWrapped(Buffer.from(vaaBytesToken.vaaBytes, "base64"))).wait();
 		wrappedTokenAddress = await targetTokenBridge.wrappedAsset(FromNetwork.wormholeChainId, Buffer.from(tryNativeToHexString(FromNetwork.testToken, "ethereum"), "hex"));
 		ShowAlert("success", `Created a Wrapped Token. Address: ${wrappedTokenAddress}`);
-	} else {
+	} else {	
 		ShowAlert("success", `Using Wrapped Token Address: ${wrappedTokenAddress}`);
 	}
+
 
 	// ShowAlert("pending", `Please Confirm on Metamask Popup for Approve and Allownece...`)
 	// const Approvetx1 = await USDTtoken.approve(network.tokenBridgeAddress, bridgeAmt)
@@ -111,11 +112,11 @@ export async function sendTransfer(chainid, amount, Recipient, ShowAlert) {
 	targetTokenBridge = new ethers.Contract(targetNetwork.tokenBridgeAddress, TokenBridgeApi.abi, targetSigner);
 
 	ShowAlert("pending", `Completing Transfer...`);
-	const completeTransferTx = await (await targetTokenBridge.completeTransfer(Buffer.from(vaaBytes.vaaBytes, "base64"))).wait();
+	// const completeTransferTx = await (await targetTokenBridge.completeTransfer(Buffer.from(vaaBytes.vaaBytes, "base64"))).wait();
 	ShowAlert("success", `Successfully sent ${amount} ${FromNetwork.nativeCurrency.symbol} to ${Recipient}! `);
 
 	return {
-		transaction: `https://moonbase.moonscan.io/tx/${completeTransferTx.transactionHash}`,
+		transaction: `https://moonbase.moonscan.io/tx/${tx.transactionHash}`,
 		wrappedAsset: wrappedTokenAddress
 	};
 }

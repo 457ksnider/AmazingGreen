@@ -4,25 +4,18 @@ import UseFormInput from "../../components/components/UseFormInput";
 import UseFormTextArea from "../../components/components/UseFormTextArea";
 import { Header } from "../../components/layout/Header";
 import NavLink from "next/link";
-import { getNewIdsFromEvent } from '@subsocial/api'
-
 import { useRouter } from "next/router";
 import useContract from '../../services/useContract'
-import useSubsocial from '../../services/Subsocial/useSubsocial'
 import isServer from "../../components/isServer";
 import { NFTStorage, File } from "nft.storage";
 import styles from "./CreateDao.module.css";
 import { Button } from "@heathmont/moon-core-tw";
 import { GenericPicture, ControlsPlus } from "@heathmont/moon-icons-tw";
 import { Checkbox } from "@heathmont/moon-core-tw";
-import {  useSnackbar } from 'notistack';
 
 export default function CreateDao() {
   const [DaoImage, setDaoImage] = useState([]);
   const { contract, signerAddress, sendTransaction } = useContract()
-  const {isReady,api,createSpace } =  useSubsocial();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
-
   const router = useRouter();
   //Storage API for images and videos
   const NFT_STORAGE_TOKEN =
@@ -81,9 +74,10 @@ export default function CreateDao() {
     }
 
   }
-
-  async function createDaoInEVM(spaceid = null){
-    enqueueSnackbar(`Uploading files to IPFS...`, { variant: 'info' })
+  //Function after clicking Create Dao Button
+  async function createDao() {
+    var CreateDAOBTN = document.getElementById("CreateDAOBTN");
+    CreateDAOBTN.disabled = true;
     let allFiles = [];
     for (let index = 0; index < DaoImage.length; index++) {
       //Gathering all files link
@@ -96,13 +90,11 @@ export default function CreateDao() {
       allFiles.push(urlImageDao);
     }
 
-    enqueueSnackbar('Successfully uploaded files to IPFS', { variant: 'success' })
     //Creating an object of all information to store in EVM
     const createdObject = {
       title: 'Asset Metadata',
       type: 'object',
       properties: {
-        spaceid: spaceid,
         Title: {
           type: 'string',
           description: DaoTitle,
@@ -132,7 +124,6 @@ export default function CreateDao() {
     };
     console.log("======================>Creating Dao");
     try {
-      enqueueSnackbar(`Creating DAO in Moonbase network...`, { variant: 'info' })
       const valueAll = await contract.get_all_daos().call() //Getting dao URI from smart contract       
 
       // //Getting the dao id of new one
@@ -151,38 +142,7 @@ export default function CreateDao() {
       return;
       // window.location.href = "/login?[/]"; //If found any error then it will let the user to login page
     }
-    enqueueSnackbar('Successfully created DAO in moonbase network', { variant: 'success' })
     router.push("/daos"); //After the success it will redirect the user to /dao page
-  }
-
-  async function ShowToast(result){
-    const { status } = result
-
-    if (!result || !status) {
-      return
-    }
-    if (status.isFinalized) {
-      const blockHash = status.isFinalized ? status.asFinalized : status.asInBlock
-      console.log('Tx finalized. Block hash', blockHash.toString())
-      const newIds = getNewIdsFromEvent(result) // get first argument from array.
-      enqueueSnackbar('Successfully created Space. ID-' + newIds, { variant: 'success' })
-      await createDaoInEVM(newIds);
-    } else if (result.isError) {
-      console.log(JSON.stringify(result))
-    } else {
-      enqueueSnackbar(`⏱ Current space tx status: ${status.type}`, { variant: 'info' })
-      console.log('⏱ Current tx status:', status.type)
-    }
-  }
-  //Function after clicking Create Dao Button
-  async function createDao() {
-
-    var CreateDAOBTN = document.getElementById("CreateDAOBTN");
-    CreateDAOBTN.disabled = true;
-    // enqueueSnackbar('Creating spaces in Subsocial...', { variant: 'info' })
-    // await createSpace(isReady,api,DaoDescription,DaoTitle, ShowToast)
-    await createDaoInEVM(0);
-   
   }
 
   function FilehandleChange(dao) {
@@ -332,7 +292,7 @@ export default function CreateDao() {
           </div>
 
           <div>
-            <Checkbox style={{color: '#41AED3'}} label="Generate Plugin" id="plugin" />
+            <Checkbox label="Generate Plugin" id="plugin" />
           </div>
           <CreateDaoBTN />
         </div>

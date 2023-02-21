@@ -209,11 +209,11 @@ export default function CreateIdeas() {
 			</Head>
 			<Header></Header>
 			<div className={`${styles.container} flex items-center justify-center flex-col gap-8`}>
+				<div className={`${styles.form} flex flex-col gap-8`}>
 				<div className={`${styles.title} gap-8 flex flex-col`}>
 					<h1 className="text-moon-32 font-bold">Create ideas</h1>
 				</div>
 				<div className={styles.divider}></div>
-				<div className={`${styles.form} flex flex-col gap-8`}>
 					<div>
 						<h6>Ideas name</h6>
 						{IdeasTitleInput}

@@ -4,7 +4,9 @@ import { TextInput } from '@heathmont/moon-core-tw';
 export default function UseFormInput({ defaultValue, type, placeholder, id }) {
 	const [value, setValue] = useState(defaultValue || '');
 	const input = (
-    <TextInput 			value={value || ''}
+    <TextInput 		
+    style={{color:'black'}}
+    	value={value || ''}
     placeholder={placeholder}
     onChange={(e) => setValue(e.target.value)}
     type={type}
