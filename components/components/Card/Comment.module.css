@@ -41,7 +41,7 @@
     line-height: 1.4;
     overflow: hidden;
     padding: 1em 11px 0.25em;
-    color: white;
+    color: var(--foreground);
 }
 
 .PostMenuArea{

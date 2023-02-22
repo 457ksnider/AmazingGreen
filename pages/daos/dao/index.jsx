@@ -162,13 +162,13 @@ export default function DAO() {
 					</div>
 
 					<div className={`${styles.tabs} flex gap-4`}>
-						<NavLink href="?q=All">
+						<NavLink href="?q=All" legacyBehavior={true}>
 							<a className="DonationBarLink tab block px-3 py-2 active">All</a>
 						</NavLink>
-						<NavLink href="?q=Today">
+						<NavLink href="?q=Today" legacyBehavior={true}>
 							<a className="DonationBarLink tab block px-3 py-2">Today</a>
 						</NavLink>
-						<NavLink href="?q=This Month">
+						<NavLink href="?q=This Month" legacyBehavior={true}>
 							<a className="DonationBarLink tab block px-3 py-2">This Month</a>
 						</NavLink>
 						{DaoURI.isOwner ? (
@@ -217,7 +217,7 @@ export default function DAO() {
 											</div>
 
 											<a href={`/daos/dao/goal?[${listItem.goalId}]`}>
-												<Button iconleft={true}>
+												<Button iconleft>
 													<ControlsChevronRight />
 													Go to Goal
 												</Button>

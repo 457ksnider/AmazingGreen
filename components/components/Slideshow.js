@@ -7,22 +7,20 @@ const Slideshow = (images = []) => {
   function Slider(each, index) {
     if (each.type.includes("image") == true) {
       return (
-        <>
-          <div
-            key={index}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              width: "100%",
-              height: "100%",
-              alignItems: "center",
-              alignContent: "center",
-              flexDirection: "row",
-            }}
-          >
-            <img style={{ width: "100%" }} src={each.url} />
-          </div>
-        </>
+        <div
+        key={index}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100%",
+          height: "100%",
+          alignItems: "center",
+          alignContent: "center",
+          flexDirection: "row",
+        }}
+      >
+        <img style={{ width: "100%" }} src={each.url} />
+      </div>
       );
     }
     if (each.type.includes("video") == true) {

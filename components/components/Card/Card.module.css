@@ -6,6 +6,8 @@
     0px 0px 1px rgba(0, 0, 0, 0.4);
   border-radius: 12px;
 
+  color:var(--foreground);
+  background-color: var(--background);
   text-align: center;
   justify-content: center;
 }

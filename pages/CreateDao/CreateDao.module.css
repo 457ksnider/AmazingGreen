@@ -7,8 +7,8 @@
   max-width: 95%;
   display: flex;
   gap: 2px;
-  align-items: center;
 }
+
 
 .divider {
   height: 1px;
@@ -22,7 +22,6 @@
   max-width: 95%;
   border: 1px solid;
   padding: 1rem;
-  color: white;
 }
 
 .form h6 {

@@ -12,10 +12,13 @@ import styles from "./CreateDao.module.css";
 import { Button } from "@heathmont/moon-core-tw";
 import { GenericPicture, ControlsPlus } from "@heathmont/moon-icons-tw";
 import { Checkbox } from "@heathmont/moon-core-tw";
+import {  useSnackbar } from 'notistack';
 
 export default function CreateDao() {
   const [DaoImage, setDaoImage] = useState([]);
   const { contract, signerAddress, sendTransaction } = useContract()
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+
   const router = useRouter();
   //Storage API for images and videos
   const NFT_STORAGE_TOKEN =
@@ -74,10 +77,9 @@ export default function CreateDao() {
     }
 
   }
-  //Function after clicking Create Dao Button
-  async function createDao() {
-    var CreateDAOBTN = document.getElementById("CreateDAOBTN");
-    CreateDAOBTN.disabled = true;
+
+  async function createDaoInEVM(){
+    enqueueSnackbar(`Uploading files to IPFS...`, { variant: 'info' })
     let allFiles = [];
     for (let index = 0; index < DaoImage.length; index++) {
       //Gathering all files link
@@ -90,6 +92,7 @@ export default function CreateDao() {
       allFiles.push(urlImageDao);
     }
 
+    enqueueSnackbar('Successfully uploaded files to IPFS', { variant: 'success' })
     //Creating an object of all information to store in EVM
     const createdObject = {
       title: 'Asset Metadata',
@@ -124,6 +127,7 @@ export default function CreateDao() {
     };
     console.log("======================>Creating Dao");
     try {
+      enqueueSnackbar(`Creating DAO in Moonbase network...`, { variant: 'info' })
       const valueAll = await contract.get_all_daos().call() //Getting dao URI from smart contract       
 
       // //Getting the dao id of new one
@@ -142,7 +146,16 @@ export default function CreateDao() {
       return;
       // window.location.href = "/login?[/]"; //If found any error then it will let the user to login page
     }
+    enqueueSnackbar('Successfully created DAO in moonbase network', { variant: 'success' })
     router.push("/daos"); //After the success it will redirect the user to /dao page
+  }
+
+  //Function after clicking Create Dao Button
+  async function createDao() {
+
+    var CreateDAOBTN = document.getElementById("CreateDAOBTN");
+    CreateDAOBTN.disabled = true;
+   await createDaoInEVM()
   }
 
   function FilehandleChange(dao) {
@@ -214,6 +227,7 @@ export default function CreateDao() {
             An dao will have its own page where people can submit their ideas.
           </p>
         </div>
+        <hr/>
           <div>
             <h6>Dao name</h6>
             {DaoTitleInput}
@@ -247,31 +261,29 @@ export default function CreateDao() {
               <div className="flex gap-4">
                 {DaoImage.map((item, i) => {
                   return (
-                    <>
-                      <div key={i} className="flex gap-4">
-                        <button
-                          onClick={DeleteSelectedImages}
-                          name="deleteBTN"
-                          id={i}
-                        >
-                          {item.type.includes("image") ? (
-                            <img
-                              className={styles.image}
-                              src={URL.createObjectURL(item)}
-                            />
-                          ) : (
-                            <>
-                              <div className="Dao-Uploaded-File-Container">
+                    <div key={i} className="flex gap-4">
+                    <button
+                      onClick={DeleteSelectedImages}
+                      name="deleteBTN"
+                      id={i}
+                    >
+                      {item.type.includes("image") ? (
+                        <img
+                          className={styles.image}
+                          src={URL.createObjectURL(item)}
+                        />
+                      ) : (
+                        <>
+                          <div className="Dao-Uploaded-File-Container">
 
-                                <span className="Dao-Uploaded-File-name">
-                                  {item.name.substring(0, 10)}...
-                                </span>
-                              </div>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </>
+                            <span className="Dao-Uploaded-File-name">
+                              {item.name.substring(0, 10)}...
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </button>
+                  </div>
                   );
                 })}
                 <div className="Dao-ImageAdd">
@@ -292,7 +304,7 @@ export default function CreateDao() {
           </div>
 
           <div>
-            <Checkbox label="Generate Plugin" id="plugin" />
+            <Checkbox label="Generate Plugin" id="plugin" style={{color: 'var(--foreground)'}} />
           </div>
           <CreateDaoBTN />
         </div>

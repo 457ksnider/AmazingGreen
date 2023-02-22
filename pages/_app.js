@@ -1,20 +1,22 @@
-import "../styles/theme.css";
-import "../styles/output.css"
-import "../styles/index.scss"
-import { ThemeProvider, moonDesignLight } from "@heathmont/moon-themes"
-import { SnackbarProvider } from "notistack"
 
-function MyApp({ Component, pageProps }) {
+import "../styles/theme.css";
+import "../styles/output.css";
+import "../styles/index.scss";
+import { ThemeProvider } from 'next-themes'
+import {SnackbarProvider} from "notistack";
+import {PolkadotProvider} from "../contexts/PolkadotContext";
+
+function MyApp({Component, pageProps}) {
 	return (
-		<SnackbarProvider anchorOrigin={{
-			vertical: 'top',
-			horizontal: 'right',
-		  }} autoHideDuration={30000} maxSnack={3}>
-			<ThemeProvider theme={moonDesignLight}>
-				<Component {...pageProps} />
-			</ThemeProvider>
+		<SnackbarProvider anchorOrigin={{vertical: "top", horizontal: "right"}} maxSnack={5}  autoHideDuration={3000} >
+			<PolkadotProvider>
+				<ThemeProvider defaultTheme={"dark"} enableColorScheme={false} attribute="class" enableSystem={false}>
+					<Component {...pageProps} />
+				</ThemeProvider>
+			</PolkadotProvider>
 		</SnackbarProvider>
-	)
+	);
 }
 
-export default MyApp
+export default MyApp;
+

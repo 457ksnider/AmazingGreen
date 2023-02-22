@@ -13,7 +13,10 @@ import {Header} from "../../../../../components/layout/Header";
 import styles from "../../../daos.module.css";
 import Skeleton from "@mui/material/Skeleton";
 import CommentBox from "../../../../../components/components/Card/Comment";
-import { sendMessage, getAllMessagesByIdea } from "../../../../../services/wormhole/useMessenger"
+import {sendMessage, getAllMessagesByIdea} from "../../../../../services/wormhole/useMessenger";
+import {useSnackbar} from "notistack";
+import {usePolkadotContext} from "../../../../../contexts/PolkadotContext";
+
 let IdeasEnd = "";
 let IdeasWaiting = false;
 let running = true;
@@ -22,31 +25,38 @@ export default function GrantIdeas() {
 	const [goalId, setGoalId] = useState(-1);
 	const [ideaId, setIdeasId] = useState(-1);
 	const [imageList, setimageList] = useState([]);
-	const [IdeasURI, setIdeasURI] = useState({ideasId: "", Title: "", Description: "", wallet: "", logo: "", End_Date: "", voted: 0, isVoted: true, allfiles: []});
+	const [IdeasURI, setIdeasURI] = useState({ideasId: "",postid:0, Title: "", Description: "", wallet: "", logo: "", End_Date: "", voted: 0, isVoted: true, allfiles: []});
 	const [DonatemodalShow, setDonatemodalShow] = useState(false);
 	const [AccountAddress, setAccountAddress] = useState("");
 	const {contract, signerAddress, sendTransaction} = useContract();
-	const [Comment, CommentInput,setComment] = UseFormTextArea({
+	const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+	const {createComment,getCommentForAPost,status} = usePolkadotContext();
+
+	const [Comment, CommentInput, setComment] = UseFormTextArea({
 		defaultValue: "",
 		placeholder: "Your comment",
 		id: "",
 		name: "comment",
 		rows: 6
 	});
-	const [emptydata, setemptydata] = useState([])
+	const [emptydata, setemptydata] = useState([]);
 
-	const [CommentsList, setCommentsList] = useState([{
-		id:0,
-		comment:"",
-		address:"",
-		date:"",
-		replies:[{
-			id:0,
-			message: "",
-			address:"",
-			date:""
-		}]
-	}]);
+	const [CommentsList, setCommentsList] = useState([
+		{
+			id: 0,
+			comment: "",
+			address: "",
+			date: "",
+			replies: [
+				{
+					id: 0,
+					message: "",
+					address: "",
+					date: ""
+				}
+			]
+		}
+	]);
 	const formatter = new Intl.NumberFormat("en-US", {
 		//Converting number into comma version
 		minimumFractionDigits: 2,
@@ -98,7 +108,7 @@ export default function GrantIdeas() {
 			}
 		};
 		fetch();
-	}, [contract]);
+	}, [status]);
 
 	useEffect(() => {
 		DesignSlide();
@@ -121,7 +131,7 @@ export default function GrantIdeas() {
 		running = true;
 		try {
 			if (contract && id) {
-				setIdeasId(id); //setting Ideas id
+				setIdeasId( Number(id)); //setting Ideas id
 				id = Number(id);
 
 				const ideaURI = await contract.ideas_uri(Number(id)).call(); //Getting ideas uri
@@ -136,25 +146,30 @@ export default function GrantIdeas() {
 				for (let i = 0; i < Allvotes.length; i++) {
 					const element = Allvotes[i];
 					if (element !== "") voted++;
-					if (element ===  window.ethereum.selectedAddress) isvoted = true;
+					if (element === window.ethereum.selectedAddress) isvoted = true;
 				}
 				setAccountAddress(object.properties.wallet.description);
 
 				setIdeasURI({
 					ideasId: id,
+					postid:Number( object.properties.postid),
 					Title: object.properties.Title.description,
 					Description: object.properties.Description.description,
 					wallet: object.properties.wallet.description,
 					logo: object.properties.logo.description.url,
 					End_Date: goalURI.properties.End_Date?.description,
 					voted: voted,
-					donation: Number( (await contract._ideas_uris(Number(id)).call()).donation)  / 10**9,
+					donation: Number((await contract._ideas_uris(Number(id)).call()).donation) / 10 ** 9,
 					isVoted: isvoted,
 					allfiles: object.properties.allFiles
 				});
 
 				setimageList(object.properties.allFiles);
-				setCommentsList(await getAllMessagesByIdea(Number(id)))
+				// setCommentsList(await getAllMessagesByIdea(Number(id)));
+
+				const comments =await getCommentForAPost(Number( object.properties.postid));
+				setCommentsList(comments)
+
 				if (document.getElementById("Loading")) document.getElementById("Loading").style = "display:none";
 			}
 		} catch (error) {
@@ -218,36 +233,56 @@ export default function GrantIdeas() {
 		}
 	}
 	async function removeElementFromArrayBYID(all, specificid, seting) {
-		seting([])
+		seting([]);
 		var storing = [];
 		for (let index = 0; index < all.length; index++) {
-		   const element = all[index];
-		   if (element.id == specificid) {
-			  continue
-		   }
-		   storing.push(element)
+			const element = all[index];
+			if (element.id == specificid) {
+				continue;
+			}
+			storing.push(element);
 		}
-  
-		seting(storing)
-	 }
-	async function PostComment(e){
+
+		seting(storing);
+	}
+
+	async function PostCommentSubsocial(e) {
 		e.preventDefault();
+		const ideaURI = JSON.parse(await contract.ideas_uri(Number(ideaId)).call()); //Getting current Idea URI for post ID
+		await createComment(Number(ideaURI.properties.postid), Comment,saveMessageSubsocial);
+	}
+	async function saveMessageSubsocial(CommentId) {
 		CommentsList.push({
-			replies:[],
+			replies: [],
 			address: window.ethereum.selectedAddress,
 			message: Comment,
 			date: new Date().toISOString(),
-			id: CommentsList.length
+			id: CommentId
 		});
-		await saveMessage();
+
 		setComment("");
-		removeElementFromArrayBYID(emptydata,0,setemptydata)
+		removeElementFromArrayBYID(emptydata, 0, setemptydata);
+		console.log("Saved Messages");
 	}
-	async function saveMessage(){
-		await sendMessage(Number(window.ethereum.networkVersion), Number(ideaId),JSON.stringify(CommentsList));
-		removeElementFromArrayBYID(emptydata,0,setemptydata)
-		console.log("Saved Messages")
-	}
+
+	// async function PostCommentInWormhole(e) {
+	// 	e.preventDefault();
+	// 	CommentsList.push({
+	// 		replies: [],
+	// 		address: window.ethereum.selectedAddress,
+	// 		message: Comment,
+	// 		date: new Date().toISOString(),
+	// 		id: CommentsList.length
+	// 	});
+	// 	await saveMessage();
+	// 	setComment("");
+	// 	removeElementFromArrayBYID(emptydata, 0, setemptydata);
+	// }
+	// async function saveMessage() {
+	// 	await sendMessage(Number(window.ethereum.networkVersion), Number(ideaId), JSON.stringify(CommentsList));
+	// 	removeElementFromArrayBYID(emptydata, 0, setemptydata);
+	// 	console.log("Saved Messages");
+	// }
 
 	return (
 		<>
@@ -262,7 +297,7 @@ export default function GrantIdeas() {
 					<div style={{position: "relative"}}>
 						<Loader
 							element={
-								<h1 className="text-moon-32 font-bold pb-2" style={{width: "78%", color: "white"}}>
+								<h1 className={`text-moon-32 font-bold pb-2`} style={{width: "78%"}}>
 									{IdeasURI.Title}
 								</h1>
 							}
@@ -283,7 +318,7 @@ export default function GrantIdeas() {
 					<div>
 						<Loader
 							element={
-								<a className="font-medium "  href={`https://moonbase.moonscan.io/address/${IdeasURI.wallet}`} rel="noreferrer" target="_blank">
+								<a className="font-medium " href={`https://moonbase.moonscan.io/address/${IdeasURI.wallet}`} style={{color:"var(--title-a-text)"}} rel="noreferrer" target="_blank">
 									{IdeasURI.wallet}
 								</a>
 							}
@@ -292,19 +327,33 @@ export default function GrantIdeas() {
 					</div>
 					<Loader
 						element={
-							<a className="text-piccolo" name="dateleft"  style={{color: "white"}}  date={IdeasURI.End_Date}>
+							<a  name="dateleft"   date={IdeasURI.End_Date}>
 								{LeftDate(IdeasURI.End_Date)}
 							</a>
 						}
 						width={"80%"}
 					/>
 
-					<Loader element={<div className="flex"  style={{color: "white"}} >Voted: {IdeasURI.voted} </div>} width={"100%"} />
-					<Loader element={<div className="flex"  style={{color: "white"}} >Donated: {IdeasURI.donation} </div>} width={"100%"} />
-					<Loader element={<p  style={{color: "white"}} >{IdeasURI.Description} </p>} width={"100%"} />
+					<Loader
+						element={
+							<div className="flex" >
+								Voted: {IdeasURI.voted}{" "}
+							</div>
+						}
+						width={"100%"}
+					/>
+					<Loader
+						element={
+							<div className="flex" >
+								Donated: {IdeasURI.donation}{" "}
+							</div>
+						}
+						width={"100%"}
+					/>
+					<Loader element={<p >{IdeasURI.Description} </p>} width={"100%"} />
 				</div>
 				<div className={`${styles.tabtitle} flex gap-4 justify-start`}>
-					<a className={`tab block cursor-pointer py-2 text-3xl text-[#e2107b]`}>Ideas</a>
+					<a className={`tab block cursor-pointer py-2 text-3xl text-[#e2107b]`} style={{color:"var(--title-a-text)"}}>Ideas</a>
 					<div className="flex justify-end w-full gap-4">
 						{!IdeasURI.isVoted ? (
 							<>
@@ -360,7 +409,7 @@ export default function GrantIdeas() {
 				</>
 			</div>
 			<div style={{padding: "4% 10%", display: "flex", justifyContent: "center"}}>
-				<form onSubmit={PostComment} style={{width: "60rem", display: "flex", flexDirection: "column", rowGap: "1rem"}}>
+				<form onSubmit={PostCommentSubsocial} style={{width: "60rem", display: "flex", flexDirection: "column", rowGap: "1rem"}}>
 					{CommentInput}
 					<div style={{display: "flex", justifyContent: "flex-end"}}>
 						<Button data-element-id="btn_donate" style={{width: "135px"}} data-analytic-event-listener="true" type="submit">
@@ -372,10 +421,9 @@ export default function GrantIdeas() {
 
 			<div style={{padding: "0 10%", display: "flex", justifyContent: "center"}}>
 				<div style={{width: "60rem", height: "100%"}}>
-					{CommentsList.map((listItem, index) => (
-						(listItem.address !== "")?
-						<CommentBox address={listItem.address} date={listItem.date} saveMessage={saveMessage}  message={listItem.message} replies={listItem.replies} id={listItem.id} key={listItem.id}/>:<></>
-					))}
+					{CommentsList.map((listItem, index) =>
+						listItem.address !== "" ? <CommentBox postid={IdeasURI.postid} commentid={listItem.id} address={listItem.address} date={listItem.date}  message={listItem.message} replies={listItem.replies} id={listItem.id} key={listItem.id} /> : <></>
+					)}
 				</div>
 			</div>
 
@@ -390,3 +438,4 @@ export default function GrantIdeas() {
 		</>
 	);
 }
+

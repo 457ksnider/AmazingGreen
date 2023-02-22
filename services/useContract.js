@@ -57,7 +57,7 @@ export default function useContract() {
 			moonbasealpha: chainConnectionConfigs.moonbasealpha
 		})
 
-		const core = HyperlaneCore.fromEnvironment("testnet2", multiProvider)
+		const core = HyperlaneCore.fromEnvironment("testnet", multiProvider)
 
 		const InterChaincontract = new ethers.Contract(InterChainABI.address, InterChainABI.abi, signer)
 		const tx = await InterChaincontract["dispatch(uint32,address,bytes)"](domain_id, erc721.address, encoded)
@@ -66,12 +66,14 @@ export default function useContract() {
 		let messageId =reciept.logs[1].topics[1];
 		console.log("Message ID ========>"+messageId)
 
-		let gasFee = ethers.utils.parseUnits("0.00000000000001",18);
-		let gasAmount = 55500000000		;
+		let gasAmount = 550000		;
 		const IGPcontract = new ethers.Contract(IGPABI.address, IGPABI.abi, signer)
+		let weiGasFee = await IGPcontract.quoteGasPayment(domain_id,gasAmount);
+		let gasFee = ethers.utils.parseUnits(Number(weiGasFee).toString(),0);
 		
 		const txIGP = await IGPcontract["payForGas(bytes32,uint32,uint256,address)"](messageId, domain_id, gasAmount, window.ethereum.selectedAddress,{
-			value:gasFee
+			value:gasFee,
+			
 		})
 		const recieptIGP = await txIGP.wait()
 		console.log(recieptIGP);

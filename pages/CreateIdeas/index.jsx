@@ -11,10 +11,14 @@ import { NFTStorage, File } from "nft.storage"
 import styles from "./CreateIdeas.module.css"
 import { Button } from "@heathmont/moon-core-tw"
 import { GenericPicture, ControlsPlus } from "@heathmont/moon-icons-tw"
+import {  useSnackbar } from 'notistack';
+import {usePolkadotContext} from "../../contexts/PolkadotContext";
 
 export default function CreateIdeas() {
 	const [IdeasImage, setIdeasImage] = useState([])
 	const { contract, signerAddress, sendTransaction } = useContract()
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+	const {createPost} = usePolkadotContext();
 	if (isServer()) return null
 
 	//Storage API for images and videos
@@ -63,8 +67,8 @@ export default function CreateIdeas() {
 
 	let id = -1
 
-	//Function after clicking Create Ideas Button
-	async function createIdeas() {
+	async function createIdeasInEVM(postid=null) {
+		enqueueSnackbar(`Uploading files to IPFS...`, { variant: 'info' })
 		var CreateIdeasBTN = document.getElementById("CreateIdeasBTN")
 		CreateIdeasBTN.disabled = true
 		let allFiles = []
@@ -78,6 +82,7 @@ export default function CreateIdeas() {
 			}
 			allFiles.push(urlImageIdeas)
 		}
+		enqueueSnackbar('Successfully uploaded files to IPFS', { variant: 'success' })
 
 		var smart_contracts = [JSON.stringify({
 			link: Qoutation1,
@@ -89,6 +94,7 @@ export default function CreateIdeas() {
 			title: "Asset Metadata",
 			type: "object",
 			properties: {
+				postid: Number(postid),
 				Title: {
 					type: "string",
 					description: IdeasTitle
@@ -122,6 +128,7 @@ export default function CreateIdeas() {
 		}
 		console.log("======================>Creating Ideas")
 		try {
+			enqueueSnackbar(`Creating Ideas in Moonbase network...`, { variant: 'info' })
 			// Creating Ideas in Smart contract
 			await sendTransaction(contract.create_ideas(JSON.stringify(createdObject), Number(id), smart_contracts))
 		} catch (error) {
@@ -129,9 +136,20 @@ export default function CreateIdeas() {
 			return
 			window.location.href = "/login?[/]" //If found any error then it will let the user to login page
 		}
+		enqueueSnackbar('Successfully created Ideas in moonbase network', { variant: 'success' })
 		window.location.href = `daos/dao/goal?[${id}]` //After the success it will redirect the user to goal page
 	}
 
+
+	//Function after clicking Create Ideas Button
+	async function createIdeas() {
+		var CreateIdeasBTN = document.getElementById("CreateIdeasBTN")
+		CreateIdeasBTN.disabled = true
+		
+		const goalURI = JSON.parse(await contract.goal_uri(Number(id)).call()) //Getting current Goal URI for space ID
+
+		await	createPost(Number(goalURI.properties.spaceid),createIdeasInEVM);
+	}
 	function CreateIdeasBTN() {
 		return (
 			<>
@@ -233,8 +251,7 @@ export default function CreateIdeas() {
 							<div className="flex gap-4">
 								{IdeasImage.map((item, i) => {
 									return (
-										<>
-											<div key={i} className="flex gap-4">
+										<div key={i} className="flex gap-4">
 												<button onClick={DeleteSelectedImages} name="deleteBTN" id={i}>
 													{item.type.includes("image") ? (
 														<img className={styles.image} src={URL.createObjectURL(item)} />
@@ -247,7 +264,6 @@ export default function CreateIdeas() {
 													)}
 												</button>
 											</div>
-										</>
 									)
 								})}
 								<div className="Ideas-ImageAdd">

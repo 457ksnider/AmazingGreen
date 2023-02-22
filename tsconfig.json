@@ -28,7 +28,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "components/components/Card/Comment.jsx", "components/components/Card/Comment.jsx"  ],
+, "components/components/Card/Comment.jsx", "components/components/Card/Comment.jsx", "contexts/PolkadotContext.jsx"  ],
   "exclude": [
     "node_modules",
   ]

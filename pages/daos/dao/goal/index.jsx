@@ -176,13 +176,13 @@ export default function Goal() {
 					</div>
 
 					<div className={`${styles.tabs} flex gap-4`}>
-						<NavLink href="?q=All">
+						<NavLink href="?q=All" legacyBehavior={true}>
 							<a className="DonationBarLink tab block px-3 py-2 active">All</a>
 						</NavLink>
-						<NavLink href="?q=Today">
+						<NavLink href="?q=Today" legacyBehavior={true}>
 							<a className="DonationBarLink tab block px-3 py-2">Today</a>
 						</NavLink>
-						<NavLink href="?q=This Month">
+						<NavLink href="?q=This Month" legacyBehavior={true}>
 							<a className="DonationBarLink tab block px-3 py-2">This Month</a>
 						</NavLink>
 						{!GoalURI.isOwner ? (

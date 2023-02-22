@@ -7,9 +7,9 @@
     flex-direction: column;
   }
   display: flex;
-  background: #191332;
+  background:var(--background);
   width: 100%;
-  color: white;
+  color: var(--foreground);
   display: flex;
 }
 
