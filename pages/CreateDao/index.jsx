@@ -304,7 +304,7 @@ export default function CreateDao() {
           </div>
 
           <div>
-            <Checkbox label="Generate Plugin" id="plugin" style={{color: 'var(--foreground)'}} />
+            <Checkbox label="Generate Plugin" id="plugin"  />
           </div>
           <CreateDaoBTN />
         </div>

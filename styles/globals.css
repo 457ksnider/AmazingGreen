@@ -16,6 +16,9 @@ body {
   color: var(--foreground);
 }
 
+[for=plugin]{
+   color:var(--foreground) !important;
+}
 
 .btn-primary {
   color: var( --btn-fg);
